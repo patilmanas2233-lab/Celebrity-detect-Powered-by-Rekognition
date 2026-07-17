@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Celebrity Detector</title>
+    <!-- Tailwind CSS for sleek UI styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Optional: Inter font for a very clean, professional look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen flex flex-col justify-between selection:bg-orange-200 selection:text-orange-900">
+
+    <!-- Navbar -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-orange-600 to-amber-500 bg-clip-text text-transparent flex items-center gap-2">
+                <svg class="w-6 h-6 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                StarSpotter
+            </h1>
+            <span class="text-xs font-semibold bg-stone-100 text-stone-600 px-3 py-1.5 rounded-full border border-stone-200 shadow-sm">v1.0 Live</span>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="max-w-5xl w-full mx-auto px-6 py-12 flex-grow grid md:grid-cols-2 gap-10 items-start">
+        
+        <!-- Left Column: Upload Controls -->
+        <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-xl shadow-stone-200/50">
+            <h2 class="text-xl font-bold mb-6 text-stone-800">Analyze Image</h2>
+            
+            <label class="group border-2 border-dashed border-stone-300 hover:border-orange-400 bg-stone-50 hover:bg-orange-50/50 transition-all duration-200 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer text-center min-h-[260px]">
+                <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="previewImage(event)">
+                
+                <div id="uploadPlaceholder" class="space-y-4">
+                    <div class="w-16 h-16 bg-white rounded-full shadow-sm border border-stone-200 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-stone-400 group-hover:text-orange-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-base font-medium text-stone-700">Click to browse or drag image here</p>
+                        <p class="text-sm text-stone-500 mt-1">High-resolution JPEG or PNG</p>
+                    </div>
+                </div>
+
+                <img id="imagePreview" class="hidden rounded-xl max-h-64 object-cover shadow-md border border-stone-200" alt="Preview">
+            </label>
+
+            <button onclick="analyzeCelebrity()" id="actionBtn" class="w-full mt-6 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg shadow-orange-500/30 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:pointer-events-none" disabled>
+                Scan for Celebrities
+            </button>
+        </div>
+
+        <!-- Right Column: Live Analysis Results -->
+        <div class="bg-white p-8 rounded-2xl border border-stone-200 shadow-xl shadow-stone-200/50 min-h-[420px] flex flex-col justify-between">
+            <div>
+                <h2 class="text-xl font-bold mb-6 text-stone-800">Results</h2>
+                
+                <!-- Idle State Message -->
+                <div id="idleState" class="text-center py-16 text-stone-500 flex flex-col items-center">
+                    <svg class="w-12 h-12 text-stone-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <p class="text-base">Upload an image to reveal insights.</p>
+                </div>
+
+                <!-- Animated Loading Spinner -->
+                <div id="loadingState" class="hidden text-center py-16 space-y-5">
+                    <div class="w-12 h-12 border-4 border-orange-100 border-t-orange-500 rounded-full animate-spin mx-auto"></div>
+                    <p class="text-sm font-medium text-stone-600 animate-pulse">Running AI facial analysis...</p>
+                </div>
+
+                <!-- Dynamic Results Output List -->
+                <div id="resultsList" class="hidden space-y-4"></div>
+            </div>
+            
+            <div id="resultFooter" class="text-xs text-stone-400 pt-6 mt-6 border-t border-stone-100 hidden text-center">
+                Processing powered securely by Amazon Rekognition
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-sm font-medium text-stone-500 py-8 bg-stone-100 border-t border-stone-200">
+        &copy; 2026 StarSpotter AI. All rights reserved.
+    </footer>
+
+    <!-- Frontend Logic Interfacing with Gateway -->
+    <script>
+        const API_URL = "https://2sbmsux5v7.execute-api.ap-south-1.amazonaws.com/celebrity";
+        const BUCKET_NAME = "detectcelebrity"; 
+
+        let selectedFile = null;
+
+        function previewImage(event) {
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                selectedFile = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('uploadPlaceholder').classList.add('hidden');
+                    const img = document.getElementById('imagePreview');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    document.getElementById('actionBtn').disabled = false;
+                }
+                reader.readAsDataURL(selectedFile);
+            }
+        }
+
+        async function analyzeCelebrity() {
+            if (!selectedFile) return;
+
+            const idleState = document.getElementById('idleState');
+            const loadingState = document.getElementById('loadingState');
+            const resultsList = document.getElementById('resultsList');
+            const resultFooter = document.getElementById('resultFooter');
+            const actionBtn = document.getElementById('actionBtn');
+
+            idleState.classList.add('hidden');
+            resultsList.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+            actionBtn.disabled = true;
+
+            try {
+                // 1. Fetch the celebrity name from your AWS backend
+                const response = await fetch(`${API_URL}?bucket=${BUCKET_NAME}&key=${selectedFile.name}`);
+                const data = await response.json();
+
+                resultsList.innerHTML = "";
+                loadingState.classList.add('hidden');
+                resultsList.classList.remove('hidden');
+                resultFooter.classList.remove('hidden');
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                if (data.results && data.results.length > 0) {
+                    // Loop through each detected celebrity
+                    for (const celeb of data.results) {
+                        
+                        // 2. NEW FEATURE: Fetch biography from Wikipedia API using the celebrity's name
+                        let bioText = "Biography information is currently unavailable for this public figure.";
+                        try {
+                            const wikiResponse = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(celeb.celebrity)}`);
+                            if (wikiResponse.ok) {
+                                const wikiData = await wikiResponse.json();
+                                // Get the first couple of sentences of their bio
+                                if (wikiData.extract) {
+                                    bioText = wikiData.extract.length > 250 ? wikiData.extract.substring(0, 250) + "..." : wikiData.extract;
+                                }
+                            }
+                        } catch (wikiError) {
+                            console.log("Failed to fetch Wikipedia data", wikiError);
+                        }
+
+                        // 3. Build the UI card with the new biography section
+                        const card = document.createElement('div');
+                        card.className = "bg-white border border-stone-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow space-y-4 flex flex-col justify-between";
+                        card.innerHTML = `
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-stone-800 text-lg">${celeb.celebrity}</span>
+                                    <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md border border-emerald-200 shadow-sm">${celeb.confidence}% Match</span>
+                                </div>
+                                <div class="w-full bg-stone-100 rounded-full h-2.5 overflow-hidden border border-stone-200/60">
+                                    <div class="bg-gradient-to-r from-orange-400 to-amber-500 h-2.5 rounded-full" style="width: ${celeb.confidence}%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- New Biography Section -->
+                            <div class="mt-4 pt-4 border-t border-stone-100">
+                                <h4 class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">About</h4>
+                                <p class="text-sm text-stone-600 leading-relaxed">${bioText}</p>
+                            </div>
+                        `;
+                        resultsList.appendChild(card);
+                    }
+                } else {
+                    resultsList.innerHTML = `
+                        <div class="text-center py-8 text-stone-500 text-sm bg-stone-50 border border-stone-200 rounded-xl">
+                            <span class="block text-2xl mb-2">🤔</span>
+                            No recognizable public figures found in this frame.
+                        </div>`;
+                }
+            } catch (error) {
+                loadingState.classList.add('hidden');
+                resultsList.classList.remove('hidden');
+                resultsList.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 text-red-700 p-5 rounded-xl text-sm shadow-sm">
+                        <strong class="font-bold">Error:</strong> ${error.message || 'Failed to fetch metadata from serverless API gateway endpoint.'}
+                    </div>`;
+            } finally {
+                actionBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
