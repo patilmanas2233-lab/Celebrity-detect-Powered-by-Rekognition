@@ -54,7 +54,7 @@ def lambda_handler(event, context):
         # 4. Store request history and results in DynamoDB
         request_id = str(uuid.uuid4())
         timestamp = datetime.utcnow().isoformat()
-        
+        #use to put data into table
         table.put_item(
             Item={
                 'RequestId': request_id,
