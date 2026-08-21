@@ -22,6 +22,8 @@ The framework implements a highly available, completely decoupled serverless arc
 * **Core Compute Engine:** An isolated AWS Lambda instance running an optimized Python 3.11+ environment that coordinates multi-service backend operations and resolves database serialization type barriers.
 * **Computer Vision Intelligence:** An automated AI/ML pipeline powered by Amazon Rekognition that calculates biometric match parameters against a shifting vector library of global public figures.
 * **State & Persistence Layers:** A secure object storage core utilizing private Amazon S3 buckets combined with a high-throughput Amazon DynamoDB transactional ledger for permanent analytic footprint logging.
+* This is my project to show that my AWS based skill are okay and I am still learning right now
+* Learning AWS was the best thing I did and that journey is still ongoing for me now , maintaining daily streak so that I can get the dream job I want 
 
 ---
 
