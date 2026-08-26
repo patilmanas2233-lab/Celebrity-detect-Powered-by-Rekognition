@@ -25,6 +25,7 @@ The framework implements a highly available, completely decoupled serverless arc
 * This is my project to show that my AWS based skill are okay and I am still learning right now
 * Learning AWS was the best thing I did and that journey is still ongoing for me now , maintaining daily streak so that I can get the dream job I want
 * This system uses the rekognition service from the AWS to recognise perfectly what is on the screen with some basic information about them fetched from the wikipedia
+* So we can say that this information if official and correct 
 
 ---
 
